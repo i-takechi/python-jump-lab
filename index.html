@@ -52,6 +52,7 @@ canvas{display:block;width:100%;aspect-ratio:480/250;image-rendering:pixelated;t
 kbd{font:650 .76rem var(--monospace);color:#dfddf4;padding:2px 5px;border:1px solid #47506e;border-radius:4px;background:#22283c}
 .section-top{border-top:1px solid #323750;display:flex;justify-content:space-between;align-items:end;gap:12px;padding-top:28px;margin-bottom:19px}
 .section-top h2,.finish h2{font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.25;margin:0;letter-spacing:-.035em}.section-top .eyebrow{margin-bottom:7px}
+.mission-flow{color:var(--muted);font-size:.92rem;margin:0 0 14px}
 .progress{display:grid;gap:5px;min-width:115px;text-align:right;color:var(--muted);font-size:.82rem}
 .progress strong{color:var(--text);font:800 1rem var(--monospace);margin-left:6px}
 .progress-dots{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.progress-dots i{height:5px;border-radius:7px;background:#353956}.progress-dots i.on{background:var(--mint)}
@@ -64,10 +65,26 @@ kbd{font:650 .76rem var(--monospace);color:#dfddf4;padding:2px 5px;border:1px so
 .card strong,.card small{display:block}.card strong{font-size:.94rem;line-height:1.35}.card small{font-size:.78rem;color:var(--muted);margin-top:3px}
 .lesson{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:30px;background:#161b30;border:1px solid var(--edge);border-radius:15px;padding:23px;margin-bottom:19px}
 .lesson h3{font-size:clamp(1.3rem,3vw,1.8rem);line-height:1.25;margin:0 0 11px}.lesson-copy>p:not(.eyebrow),.objective p,.finish p:not(.eyebrow){color:#d5dbee}
+.code-reading h4,.prediction legend{font-size:.95rem;font-weight:850;color:var(--mint);margin:0 0 6px}
+.code-reading dl{margin:0 0 14px}
+.code-reading dl>div{padding:7px 0;border-bottom:1px solid #303750}
+.code-reading dd{margin:3px 0 0;color:#d5dbee;font-size:.94rem;line-height:1.52}
+.code-reading dt code{color:#dfd5ff;overflow-wrap:anywhere}
+.prediction{min-inline-size:0;border:1px solid #3f4967;border-radius:8px;padding:6px 11px 9px;margin:0 0 12px}
+.prediction legend{padding-inline:4px}
+#prediction-question{margin:0 0 7px;font-size:.94rem}
+.prediction-options{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.prediction-options button{background:#242c46;border:1px solid #4a5678;border-radius:6px;padding:5px 10px;min-height:36px;text-align:left;font:.9rem/1.4 var(--monospace)}
+.prediction-options button:hover{border-color:var(--lav)}
+.prediction-options button.correct{color:var(--mint);border-color:#79cba3;background:#203a39}
+.prediction-options button.incorrect{color:#ffc5d8;border-color:#b57a98}
+#prediction-feedback{color:#e2ddf4;font-size:.9rem;line-height:1.5;margin:8px 0 0}
+#prediction-feedback:empty{display:none}
 .objective{margin:14px 0;padding:10px 13px;border-radius:8px;border-left:3px solid var(--mint);background:#212941}.objective strong{color:var(--mint);font-size:.83rem}.objective p{margin:3px 0 0}
 details{color:#ded8f7}summary{cursor:pointer;font-weight:700}details p{margin:8px 0 0}details details{margin:9px 0 0}
 code,pre,textarea{font-family:var(--monospace)}code{background:#222845;padding:1px 4px;border-radius:4px;color:#e7d9ff}pre{white-space:pre-wrap;overflow-wrap:anywhere}
-.lesson-code{background:#101426;border:1px solid #3d4562;border-radius:10px;overflow:hidden;min-width:0}
+.lesson-code{background:#101426;border:1px solid #3d4562;border-radius:10px;overflow:hidden;min-width:0;align-self:start}
+.editor-guide{margin:0;padding:10px 13px;background:#181e33;border-bottom:1px solid #303750;color:#d8def1;font-size:.91rem}
 .editor-top,.runbar,.after-run{display:flex;gap:12px;align-items:center;padding:8px 12px}.editor-top{background:#202640;border-bottom:1px solid #363e5c}.window-dots{color:#a996d9;letter-spacing:1px;font-size:.6rem}.editor-top label{font:600 .82rem var(--monospace);color:#d6d0ec}.editor-top button{margin-left:auto}
 textarea{display:block;width:100%;min-height:153px;border:0;border-radius:0;background:#11162a;color:#e1eaff;padding:12px 13px;resize:vertical;line-height:1.5;tab-size:4;font-size:.95rem}
 textarea:focus-visible{outline-offset:-3px}
@@ -117,19 +134,30 @@ textarea:focus-visible{outline-offset:-3px}
    <div><p class="eyebrow">THE MISSIONS</p><h2 id="mission-heading">4つのミッション</h2></div>
    <div class="progress"><span>クリア <strong id="progress-text">0 / 4</strong></span><div class="progress-dots" id="progress-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
   </div>
+  <p class="mission-flow">遊び方を試したら、ミッション1へ。各ミッションでコードを読み、結果を予想してから、自分で書き換えてみよう。</p>
   <div class="cards" id="mission-buttons" role="group" aria-label="ミッションを選ぶ"></div>
   <article class="lesson" aria-labelledby="lesson-title">
    <div class="lesson-copy">
     <p class="eyebrow" id="lesson-kicker"></p>
     <h3 id="lesson-title" tabindex="-1"></h3>
     <p id="lesson-concept"></p>
+    <section class="code-reading" aria-labelledby="reading-heading">
+     <h4 id="reading-heading">コードを読もう</h4>
+     <dl id="lesson-reading"></dl>
+    </section>
+    <fieldset class="prediction">
+     <legend>結果を予想しよう</legend>
+     <p id="prediction-question"></p>
+     <div class="prediction-options" id="prediction-options" role="group" aria-labelledby="prediction-question"></div>
+     <p id="prediction-feedback" role="status" aria-live="polite"></p>
+    </fieldset>
     <div class="objective"><strong>クリア条件</strong><p id="lesson-goal"></p></div>
-    <p id="lesson-prepare" hidden></p>
     <details id="hint"><summary>ヒントを開く</summary><p id="hint-text"></p><details id="answer"><summary>答えを確認する</summary><pre id="answer-text"></pre></details></details>
    </div>
    <div class="lesson-code">
     <div class="editor-top"><span class="window-dots" aria-hidden="true">● ● ●</span><label for="editor">mission.py</label><button id="reset" type="button">元に戻す</button></div>
-    <textarea id="editor" rows="8" aria-describedby="editor-key" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    <p class="editor-guide" id="lesson-edit"></p>
+    <textarea id="editor" rows="8" aria-describedby="lesson-edit editor-key" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
     <p class="sr" id="editor-key">Ctrl または Command と Enter で実行。Tab で次の操作に移動できます。</p>
     <div class="runbar"><button class="primary small" id="run" type="button">▶　コードを実行</button><span id="shortcut"><kbd>Ctrl / ⌘</kbd> + <kbd>Enter</kbd></span></div>
     <div class="console"><span>実行結果</span><pre id="output" role="status" aria-live="polite"></pre></div>
@@ -137,7 +165,7 @@ textarea:focus-visible{outline-offset:-3px}
    </div>
   </article>
   <article id="finish" class="finish" hidden>
-   <div><p class="eyebrow">ALL MISSIONS CLEAR ／ 仕上げ 7分</p><h2 tabindex="-1" id="finish-title">ラボ認定、ゲーム改造クリア！</h2><p>改造したコースで障害物を3つ飛び越えよう。余裕があれば、コードの数値をさらに変えてみよう。</p><p id="finish-status" role="status"></p></div>
+   <div><p class="eyebrow">ALL MISSIONS CLEAR ／ 仕上げ 7分</p><h2 tabindex="-1" id="finish-title">ラボ認定、ゲーム改造クリア！</h2><p>改造したコースで障害物を3つ飛び越えよう。最後に、どのコードを変えるとゲームの何が変わったか、1つ選んで自分の言葉で説明してみよう。</p><p id="finish-status" role="status"></p></div>
    <button class="primary small" id="final-play" type="button">仕上げのコースに挑戦</button>
   </article>
   <details class="review"><summary>今日のまとめ</summary><dl>
@@ -145,6 +173,8 @@ textarea:focus-visible{outline-offset:-3px}
    <div><dt>if</dt><dd>条件が成り立つときだけ、字下げされた処理を実行する。</dd></div>
    <div><dt>for</dt><dd>リストなどの要素を1つずつ取り出し、同じ処理を繰り返す。</dd></div>
    <div><dt>while</dt><dd>条件が成り立つ間は繰り返す。条件に使う値を更新すると終了できる。</dd></div>
+   <div><dt>関数</dt><dd><code>def</code> で処理に名前を付け、引数で値を渡す。<code>return</code> は結果を呼び出した場所に返し、<code>print()</code> は値を画面に表示する。</dd></div>
+   <div><dt>for と while の使い分け</dt><dd>リストの各要素を順に使うなら <code>for</code>。速度が上限に達するまで処理を続けるなら <code>while</code>。</dd></div>
   </dl></details>
  </section>
 </main>
@@ -222,7 +252,22 @@ per:
   {
     label: 'ジャンプを強化', topic: '変数・数値', time: '7分',
     title: 'ジャンプを高くしよう',
-    concept: '変数は、値につける名前。jump_power の数値を変えると、同じジャンプ操作でも飛ぶ高さが変わる。',
+    concept: 'プログラムは、コンピューターに渡す指示。まずは、ジャンプの強さを数字で決めて、画面に表示してみよう。',
+    reading: [
+      ['# ジャンプの強さ', '# から行末まではコメント。コードを読む人へのメモとして使える。'],
+      ['jump_power = 15', '= は右側の値を左側の名前に入れる記号。このように値を覚えておける名前を「変数」と呼ぶ。15 は整数（int）。'],
+      ['print("ジャンプの強さ", jump_power)', 'print() は画面に表示する命令。引用符で囲んだ文字列と、jump_power に入っている値を順番に表示する。'],
+    ],
+    prediction: {
+      question: 'jump_power が 15 のとき、print(jump_power + 3) は何を表示する？',
+      options: [
+        ['15', '先に jump_power + 3 を計算してから、print() が結果を表示するよ。'],
+        ['18', '15 + 3 の結果が表示される。変数 jump_power の中身は 15 のまま。'],
+        ['jump_power + 3', '引用符のない jump_power は変数名。計算には中身の 15 が使われるよ。'],
+      ],
+      correct: 1,
+    },
+    edit: '「=」の右側にある 15 を書き換えて実行。実行結果に出る数字を確認しよう。',
     goal: 'jump_power を 22〜28 の整数にする。実行できたら、ボタン1つで高さの違いを試せる。',
     hint: 'jump_power = の右側にある 15 を変えよう。まずは 24 で試してみよう。',
     start: '# ジャンプの強さ（数字が大きいほど高く飛ぶ）\njump_power = 15\nprint("ジャンプの強さ", jump_power)',
@@ -238,7 +283,22 @@ per:
   {
     label: 'シールド発動', topic: 'if・真偽値', time: '8分',
     title: 'エネルギーがたまったら守ろう',
-    concept: 'if は「もし〜なら」。条件が成り立つときだけ、字下げした行を実行する。True と False は状態を表す値。',
+    concept: 'if は「もし〜なら」。エネルギーの量を比べて、シールドが使えるかどうかを決めよう。',
+    reading: [
+      ['def has_shield(energy):', 'def で処理に名前を付ける。このまとまりが「関数」。has_shield(3) と呼ぶと、関数の中では energy が 3 になる。'],
+      ['if energy >= 9:', '>= は「以上」。比べた結果は True（成り立つ）か False（成り立たない）。コロンの次の行を半角スペース4つ分下げると、if の中の処理になる。'],
+      ['return True / return False', 'return は値を呼び出し元に返し、その場で関数を終える。条件が成り立てば内側の True、成り立たなければ if の外側の False を返す。'],
+    ],
+    prediction: {
+      question: '初期コードの条件が energy >= 9 のとき、has_shield(9) は何を返す？',
+      options: [
+        ['True', '「9以上」には9ちょうども入る。if の中の return True が実行される。'],
+        ['False', '9 と 9 は同じ値。「以上」は同じ値も条件を満たすよ。'],
+        ['9', '9 は関数に渡す値。返る値は、実行された return の後ろに書いてあるよ。'],
+      ],
+      correct: 0,
+    },
+    edit: 'if の行で発動の基準を変えて実行。「エネルギー3」の結果を確認しよう。',
     goal: 'energy が 3 以上なら True を返す。シールドがあれば、衝突を1回だけ防げる。',
     hint: '「3以上」は energy >= 3 と書く。3ちょうどでも True になるようにしよう。',
     start: 'def has_shield(energy):\n    if energy >= 9:  # 発動の条件を変更\n        return True\n    return False\n\nprint("エネルギー3:", has_shield(3))',
@@ -255,7 +315,22 @@ per:
   {
     label: '障害物を作る', topic: 'for・リスト', time: '9分',
     title: '3種類の障害物を並べよう',
-    concept: 'リストは複数の値をまとめたもの。for を使うと、リストの数字を1つずつ取り出して同じ処理ができる。',
+    concept: 'リストには複数の値を順番に入れられる。for を使って、障害物の高さを1つずつ作ろう。',
+    reading: [
+      ['[24, 42, 60] と heights = []', '角かっこで囲み、値をカンマで区切るとリストになる。[] は空のリスト。heights に計算した高さをためていく。'],
+      ['for height in base_heights:', 'base_heights から値を先頭から1つずつ取り出して height に入れ、字下げされた処理を繰り返す。height は 24 → 42 → 60 と変わる。'],
+      ['heights.append(height)', 'append() はリストの末尾に値を1つ追加する。ループが終わったら、for の外にある return heights で完成したリストを返す。'],
+    ],
+    prediction: {
+      question: '初期コードで1回目の append が終わった直後、heights の中身は？',
+      options: [
+        ['[]', '空のリストは実行前の状態。最初の append で1つ増えるよ。'],
+        ['[24, 42, 60]', '最初の繰り返しで取り出すのは先頭の1つ。残りは次の繰り返しで入るよ。'],
+        ['[24]', '先頭の 24 が height に入り、append でリストに1つ追加される。'],
+      ],
+      correct: 2,
+    },
+    edit: 'append() に渡す値を変更して実行。実行結果の3つの高さが変わったか見てみよう。',
     goal: 'for の中で height に 10 を足して append しよう。34、52、70 の3種類がコースに加わる。',
     hint: 'append() はリストの末尾に値を追加する。append(height) のかっこの中で 10 を足そう。',
     start: 'def build_heights(base_heights):\n    heights = []\n    for height in base_heights:\n        heights.append(height)  # 高さを10増やす\n    return heights\n\nprint(build_heights([24, 42, 60]))',
@@ -271,7 +346,22 @@ per:
   {
     label: '速度を上げる', topic: 'while・繰り返し', time: '9分',
     title: '飛び越えるたびに加速させよう',
-    concept: 'while は条件が成り立つ間、処理を続ける。今回は速度を1ずつ上げ、上限に着いたところで止める。',
+    concept: 'while は条件が成り立つ間、処理を続ける。速度を1ずつ上げて、上限に着いたら止めよう。',
+    reading: [
+      ['build_speeds(3, 6)', '引数は書いた順に渡る。最初の速度 speed は 3、上限 limit は 6。speeds = [speed] で最初の速度をリストに入れる。'],
+      ['while speed < 4:', '< は「より小さい」。while は毎回、処理を始める前に条件を確認する。speed が 4 になると、4 < 4 は False なので繰り返しを終える。'],
+      ['speed += 1', 'speed = speed + 1 と同じ。速度を1増やしてから append() で記録する。speed を更新するから、いずれ条件が False になる。'],
+    ],
+    prediction: {
+      question: '初期コードのまま build_speeds(3, 6) を呼ぶと、どのリストが返る？',
+      options: [
+        ['[3]', '最初の speed は 3。3 < 4 が成り立つので、while の中が1回動くよ。'],
+        ['[3, 4]', '最初に 3 があり、1回の繰り返しで 4 が追加される。次の条件チェックで止まる。'],
+        ['[3, 4, 5, 6]', '6 は関数に渡っているけれど、初期コードの while が見ているのは固定の 4 だよ。'],
+      ],
+      correct: 1,
+    },
+    edit: 'while の条件を、渡された上限の値を使う形に変えて実行。どの数字まで並ぶか確かめよう。',
     goal: '上限より遅い間だけ速度を上げる。最初は3で、障害物を越えるたびに4、5、6へ。',
     hint: '「上限より小さい」は speed < limit。speed += 1 があるので、いずれ上限に着く。',
     start: 'def build_speeds(speed, limit):\n    speeds = [speed]\n    while speed < 4:  # 数字の4を上限の変数に置き換える\n        speed += 1\n        speeds.append(speed)\n    return speeds\n\nprint(build_speeds(3, 6))',
@@ -507,6 +597,7 @@ function makeGame({ beep, onFinish }) {
 const el = (id) => document.getElementById(id);
 const storageKey = 'jump-lab-workshop-v1';
 const saved = readProgress();
+const predictions = [];
 let active = 0;
 let runningCode = false;
 let runnerUrl;
@@ -594,13 +685,55 @@ const cards = lessons.map((lesson, index) => {
   return { button, number, detail };
 });
 
+function showReading(lesson, index) {
+  el('lesson-reading').replaceChildren(...lesson.reading.map(([snippet, explanation]) => {
+    const row = document.createElement('div');
+    const term = document.createElement('dt');
+    const code = document.createElement('code');
+    const definition = document.createElement('dd');
+    code.textContent = snippet;
+    definition.textContent = explanation;
+    term.append(code);
+    row.append(term, definition);
+    return row;
+  }));
+  const { question, options, correct } = lesson.prediction;
+  el('prediction-question').textContent = question;
+  const feedback = el('prediction-feedback');
+  const buttons = options.map(([label], option) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.onclick = () => {
+      predictions[index] = option;
+      updateAnswer();
+    };
+    return button;
+  });
+  function updateAnswer() {
+    const selected = predictions[index];
+    buttons.forEach((button, option) => {
+      const isSelected = selected === option;
+      button.setAttribute('aria-pressed', String(isSelected));
+      button.classList.toggle('correct', isSelected && option === correct);
+      button.classList.toggle('incorrect', isSelected && option !== correct);
+    });
+    feedback.textContent = selected === undefined ? '' :
+      (selected === correct ? '✓ 正解。' : 'もう一度考えてみよう。') + options[selected][1];
+  }
+  el('prediction-options').replaceChildren(...buttons);
+  updateAnswer();
+}
+
 function showLesson(index, focus = false) {
   const lesson = lessons[index];
   active = index;
   el('lesson-kicker').textContent = `MISSION 0${index + 1} ／ ${lesson.topic} ／ ${lesson.time}`;
   el('lesson-title').textContent = lesson.title;
   el('lesson-concept').textContent = lesson.concept;
+  showReading(lesson, index);
   el('lesson-goal').textContent = lesson.goal;
+  el('lesson-edit').textContent = lesson.edit;
   el('hint-text').textContent = lesson.hint;
   el('answer-text').textContent = lesson.answer;
   el('hint').open = false;
@@ -610,12 +743,8 @@ function showLesson(index, focus = false) {
   showOutput(alreadyApplied ? '✓ クリア済み。保存した変更で遊べます。' : 'コードを書き換えて実行しよう。', alreadyApplied ? 'success' : '');
   el('after-run').hidden = !alreadyApplied;
   el('next').textContent = index < lessons.length - 1 ? '次のミッション' : (Object.keys(saved.clears).length === lessons.length ? '仕上げへ' : '次の未クリアへ');
-  if (index === 0) {
-    el('lesson-prepare').textContent = '完成見本で操作を試し、実行後は自分の数字で飛んでみよう。';
-    el('lesson-prepare').hidden = false;
-  } else el('lesson-prepare').hidden = true;
   updateProgress();
-  if (focus) el('lesson-title').focus({ preventScroll: true });
+  if (focus) el('lesson-title').focus();
 }
 
 function updateProgress() {
@@ -697,7 +826,10 @@ async function runLesson() {
     if (result.error) {
       let advice = 'エラーが出た行の近くを確認しよう。ヒントも使えるよ。';
       if (/indent/i.test(result.error)) advice = '行の先頭の空白を確認しよう。if や繰り返しの中は半角スペース4つずつ下げる。';
-      if (/time.?limit|ran too long/i.test(result.error)) advice = '実行を停止しました。while の条件がいつ False になるか確認しよう。';
+      else if (/time.?limit|ran too long/i.test(result.error)) advice = '実行を停止しました。while の条件がいつ False になるか確認しよう。';
+      else if (/NameError/.test(result.error)) advice = '名前のつづりを確認しよう。変数名は大文字と小文字も区別されるよ。';
+      else if (/SyntaxError/.test(result.error)) advice = 'かっこや引用符が閉じているか、if・for・while の行末に半角のコロン「:」があるか確認しよう。';
+      else if (/TypeError/.test(result.error)) advice = '値の種類を確認しよう。たとえば引用符で囲んだ「"24"」は文字列で、24 は整数になるよ。';
       if (current) showOutput(prefix + advice + '\n' + result.error, 'error');
       return;
     }
