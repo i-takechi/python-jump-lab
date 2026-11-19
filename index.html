@@ -41,7 +41,10 @@ h1 em{font-style:normal;color:var(--mint)}
 .cabinet{background:#14182b;border:1px solid #454769;border-radius:18px;padding:12px;box-shadow:0 18px 45px #080a19a6}
 .cab-head,.cab-foot{display:flex;align-items:center;justify-content:space-between}
 .cab-head{padding:3px 5px 11px;color:var(--muted);font-size:.83rem}.cab-head strong{display:flex;align-items:center;gap:9px;color:#eeeaff;font-size:.89rem}
-.cab-head>span{color:#e1d4ff;background:#2f284c;border:1px solid #4c3e74;border-radius:6px;padding:2px 8px}
+.course-controls{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px}
+#game-mode{color:#e1d4ff;background:#2f284c;border:1px solid #4c3e74;border-radius:6px;padding:2px 8px}
+#course-switch{background:#1b2236;border:1px solid #3b4563;border-radius:6px;padding:2px 8px;font-size:.81rem}
+#course-switch:hover{border-color:var(--lav)}
 .screen{position:relative;border:1px solid #545483;border-radius:9px;overflow:hidden;background:#252346;isolation:isolate}
 canvas{display:block;width:100%;aspect-ratio:480/250;image-rendering:pixelated;touch-action:manipulation}
 .hud{position:absolute;inset:10px 12px auto;display:flex;justify-content:space-between;pointer-events:none;font:700 clamp(.6rem,1.25vw,.82rem) var(--monospace);letter-spacing:.08em;color:#fff;text-shadow:1px 2px 2px #121127}
@@ -117,7 +120,7 @@ textarea:focus-visible{outline-offset:-3px}
    <p class="details">インストール不要 <span>・</span> はじめての人向け</p>
   </div>
   <div class="cabinet" id="playground">
-   <div class="cab-head"><strong><span></span> プレイ画面</strong><span id="game-mode">おためしコース · 5分</span></div>
+   <div class="cab-head"><strong><span></span> プレイ画面</strong><div class="course-controls"><span id="game-mode">おためしコース · 5分</span><button id="course-switch" type="button" hidden>自分のコースへ</button></div></div>
    <div class="screen">
     <canvas id="game" width="480" height="250" aria-label="ロボットで障害物を飛び越えるゲーム"></canvas>
     <div class="game-shade" id="game-shade">
@@ -599,6 +602,7 @@ const storageKey = 'jump-lab-workshop-v1';
 const saved = readProgress();
 const predictions = [];
 let active = 0;
+let currentGameCourse = 'demo';
 let runningCode = false;
 let runnerUrl;
 let audio;
@@ -749,6 +753,7 @@ function showLesson(index, focus = false) {
 
 function updateProgress() {
   const count = Object.keys(saved.clears).length;
+  el('course-switch').hidden = count === 0;
   el('progress-text').textContent = count + ' / ' + lessons.length;
   [...el('progress-dots').children].forEach((bar, index) => bar.classList.toggle('on', index < count));
   cards.forEach(({ button, number, detail }, index) => {
@@ -775,8 +780,15 @@ function courseConfig() {
   return Object.assign({}, ...Object.values(saved.clears).map((mark) => mark.config));
 }
 
+function selectGameCourse(course) {
+  currentGameCourse = course;
+  const demo = course === 'demo';
+  game.setCourse(demo ? {} : courseConfig(), course === 'final');
+  el('course-switch').textContent = demo ? '自分のコースへ' : 'おためしコースに戻る';
+}
+
 function goToGame(final = false) {
-  game.setCourse(courseConfig(), final);
+  selectGameCourse(final ? 'final' : 'custom');
   el('playground').scrollIntoView({ block: 'center' });
   game.focus();
 }
@@ -840,7 +852,7 @@ async function runLesson() {
     }
     saved.clears[index] = { code, value: result.value, config };
     persist();
-    game.setCourse(courseConfig());
+    selectGameCourse('custom');
     updateProgress();
     beep('clear');
     if (current) {
@@ -877,6 +889,10 @@ el('reset').onclick = () => {
   el('editor').focus();
 };
 el('run').onclick = runLesson;
+el('course-switch').onclick = () => {
+  selectGameCourse(currentGameCourse === 'demo' ? 'custom' : 'demo');
+  game.focus();
+};
 el('try-game').onclick = (event) => { event.preventDefault(); goToGame(); };
 el('final-play').onclick = () => goToGame(true);
 el('next').onclick = () => {
@@ -885,7 +901,6 @@ el('next').onclick = () => {
   else showLesson(lessons.findIndex((_, index) => !saved.clears[index]), true);
 };
 
-if (Object.keys(saved.clears).length) game.setCourse(courseConfig());
 showLesson(Math.max(0, lessons.findIndex((_, index) => !saved.clears[index])));
 </script>
 </body>
